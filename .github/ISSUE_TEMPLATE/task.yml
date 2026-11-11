@@ -1,0 +1,15 @@
+name: Задача
+description: Новая работа по сайту
+labels: [task]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Что нужно сделать и зачем
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Критерии готовности
+      placeholder: "- страница /uslugi/ свёрстана по паттернам\n- Lighthouse ≥ 90"

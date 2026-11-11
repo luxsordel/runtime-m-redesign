@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    name: Docker Compose config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: cp .env.example .env
+      - run: docker compose config --quiet
+
+  php-lint:
+    name: PHP syntax (8.3)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: none
+      - name: php -l
+        run: |
+          files=$(find wp-content -name '*.php' -not -path '*/vendor/*')
+          [ -z "$files" ] && { echo "no PHP files"; exit 0; }
+          echo "$files" | xargs -n1 php -l
+
+  json:
+    name: JSON validity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: find . -name '*.json' -not -path './node_modules/*' -not -path './.git/*' -print0 | xargs -0 -n1 jq empty

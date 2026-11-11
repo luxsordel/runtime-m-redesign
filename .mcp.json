@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@0.0.85", "--browser", "chromium", "--output-dir", "docs/screenshots"]
+    },
+    "windows": {
+      "command": "uvx",
+      "args": ["windows-mcp@0.8.8", "serve"]
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "claude-opus-5-5",
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "WebSearch",
+      "WebFetch",
+      "mcp__playwright",
+      "Bash(docker compose *)",
+      "Bash(docker ps*)",
+      "Bash(docker logs *)",
+      "Bash(docker exec *)",
+      "Bash(magick *)",
+      "Bash(python *)",
+      "Bash(npx *)",
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(curl *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "PowerShell(docker compose *)",
+      "PowerShell(magick *)",
+      "PowerShell(Invoke-WebRequest *)"
+    ],
+    "ask": [
+      "mcp__windows",
+      "Bash(winget *)",
+      "PowerShell(winget *)",
+      "Bash(rm *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(rsync *)",
+      "Bash(git push*)"
+    ],
+    "deny": [
+      "Bash(docker compose down -v*)",
+      "Bash(docker volume rm*)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "PowerShell(Remove-Item * -Recurse*)"
+    ]
+  }
+}

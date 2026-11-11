@@ -1,0 +1,97 @@
+# Локальная копия сайта для разработки.
+#   docker compose up -d           — запустить
+#   docker compose run --rm wpcli <команда>   — WP-CLI (например: plugin list)
+#   docker compose down            — остановить (данные сохраняются)
+#
+# Сайт:        http://localhost:8080   (админка: /wp-admin)
+# phpMyAdmin:  http://localhost:8081
+# Почта (все письма с сайта перехватываются): http://localhost:8025
+
+name: site-redesign
+
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:6-php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: &wp_config_extra |
+        define('WP_ENVIRONMENT_TYPE', 'local');
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_MEMORY_LIMIT', '512M');
+        define('SMTP_HOST', 'mailpit');
+    volumes:
+      - wp_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/zz-custom.ini:ro
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    profiles: ["tools"]
+    entrypoint: ["wp"]
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: *wp_config_extra
+      HOME: /tmp
+    volumes:
+      - wp_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+      - ./backups:/backups
+      - ./import:/import
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/zz-custom.ini:ro
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      UPLOAD_LIMIT: 512M
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+
+volumes:
+  db_data:
+  wp_core:

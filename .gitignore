@@ -1,0 +1,28 @@
+# Секреты и локальные настройки
+.env
+.claude/settings.local.json
+
+# Данные сайта клиента — никогда не коммитим
+import/
+backups/
+*.wpress
+*.sql
+*.sql.gz
+
+# wp-content: в репозитории только собственный код (mu-plugins и своя тема)
+wp-content/*
+!wp-content/mu-plugins/
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/runtime-m/
+
+# Рабочие исходники изображений (оптимизированные лежат в теме)
+assets/images/*
+!assets/images/.gitkeep
+
+# Служебное
+node_modules/
+.playwright-mcp/
+*.log
+.DS_Store
+Thumbs.db
